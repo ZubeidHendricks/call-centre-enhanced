@@ -1,4 +1,3 @@
-import { getHumeAccessToken } from "@/utils/getHumeAccessToken";
 import dynamic from "next/dynamic";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -11,13 +10,9 @@ const CallManager = dynamic(() => import("@/components/CallManager"), {
   ssr: false,
 });
 
-export default async function Page() {
-  const accessToken = await getHumeAccessToken();
+export const dynamic = 'force-dynamic';
 
-  if (!accessToken) {
-    throw new Error("Failed to get Hume access token");
-  }
-
+export default function Page() {
   return (
     <div className="grow flex flex-col max-w-7xl mx-auto w-full p-4">
       <Tabs defaultValue="call-manager" className="w-full">
@@ -34,7 +29,7 @@ export default async function Page() {
         </TabsContent>
         
         <TabsContent value="simple-chat" className="h-full">
-          <Chat accessToken={accessToken} />
+          <Chat />
         </TabsContent>
       </Tabs>
     </div>
