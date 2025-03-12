@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useVoice } from "@humeai/voice-react";
+import { useVoice, VoiceProvider } from "@humeai/voice-react";
 import PhoneNumberReader from './PhoneNumberReader';
 import { Button } from './ui/button';
 import { Phone, Save, FileText, ArrowRight, ArrowLeft } from 'lucide-react';
@@ -21,7 +21,68 @@ interface CallResponse {
   notes?: string;
 }
 
+// Main wrapper component that fetches the token
 export default function CallManager() {
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch the access token on the client side
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch('/api/auth/token');
+        
+        if (!response.ok) {
+          throw new Error('Failed to get access token');
+        }
+        
+        const data = await response.json();
+        setAccessToken(data.accessToken);
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Error fetching token:', err);
+        setError('Failed to connect to Hume API. Please check your API credentials.');
+        setIsLoading(false);
+      }
+    };
+    
+    fetchToken();
+  }, []);
+
+  // optional: use configId from environment variable
+  const configId = process.env['NEXT_PUBLIC_HUME_CONFIG_ID'];
+  
+  if (isLoading) {
+    return <div className="p-4 text-center">Connecting to Hume API...</div>;
+  }
+  
+  if (error || !accessToken) {
+    return (
+      <div className="p-4 text-center">
+        <p className="text-red-500">{error || 'Failed to get Hume access token. Please add your API keys to the environment variables.'}</p>
+        <p className="mt-2 text-sm">Check your .env file or Vercel environment variables and add:</p>
+        <pre className="mt-2 p-2 bg-gray-100 dark:bg-gray-800 rounded text-left inline-block">
+          HUME_API_KEY=your-api-key<br/>
+          HUME_SECRET_KEY=your-secret-key
+        </pre>
+      </div>
+    );
+  }
+  
+  return (
+    <VoiceProvider
+      auth={{ type: "accessToken", value: accessToken }}
+      configId={configId}
+    >
+      <CallManagerContent />
+    </VoiceProvider>
+  );
+}
+
+// Inner component that uses the useVoice hook inside the VoiceProvider
+function CallManagerContent() {
   const [phoneNumbers, setPhoneNumbers] = useState<PhoneNumber[]>([]);
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [responses, setResponses] = useState<Record<string, CallResponse>>({});
