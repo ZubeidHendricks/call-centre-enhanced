@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from 'react';
 import { useVoice } from "@humeai/voice-react";
 import PhoneNumberReader from './PhoneNumberReader';
