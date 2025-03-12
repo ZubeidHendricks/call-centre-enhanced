@@ -11,6 +11,10 @@ const CallManager = dynamic(() => import("@/components/CallManager"), {
   ssr: false,
 });
 
+const Dashboard = dynamic(() => import("@/components/Dashboard"), {
+  ssr: false,
+});
+
 // Force dynamic rendering instead of static generation
 export const dynamicParams = true;
 export const fetchCache = 'force-no-store';
@@ -18,11 +22,18 @@ export const fetchCache = 'force-no-store';
 export default function Page() {
   return (
     <div className="grow flex flex-col max-w-7xl mx-auto w-full p-4">
-      <Tabs defaultValue="call-manager" className="w-full">
+      <Tabs defaultValue="dashboard" className="w-full">
         <TabsList className="mb-4">
+          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="call-manager">Call Manager</TabsTrigger>
           <TabsTrigger value="simple-chat">Simple Chat</TabsTrigger>
         </TabsList>
+        
+        <TabsContent value="dashboard" className="flex-grow">
+          <div className="border border-border rounded-lg p-6 h-full">
+            <Dashboard />
+          </div>
+        </TabsContent>
         
         <TabsContent value="call-manager" className="flex-grow">
           <div className="border border-border rounded-lg p-6 h-full">
