@@ -1,7 +1,8 @@
-import dynamic from "next/dynamic";
+import { lazy } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Import components with client-side rendering only
+import dynamic from 'next/dynamic';
 const Chat = dynamic(() => import("@/components/Chat"), {
   ssr: false,
 });
@@ -10,7 +11,9 @@ const CallManager = dynamic(() => import("@/components/CallManager"), {
   ssr: false,
 });
 
-export const dynamic = 'force-dynamic';
+// Force dynamic rendering instead of static generation
+export const dynamicParams = true;
+export const fetchCache = 'force-no-store';
 
 export default function Page() {
   return (
